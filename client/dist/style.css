@@ -63,3 +63,16 @@
  body {
    display: grid;
  }
+
+
+
+.start {
+  text-align: center;
+  display: block;
+}
+
+.game {
+  text-align: center;
+  display: none;
+}
+
