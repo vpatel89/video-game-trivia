@@ -13,14 +13,14 @@ class App extends React.Component {
     this.state = {
       username: '',
       currentScore: 0,
-      timer: 5,
-      data: [],
+      timer: 15,
       gameImage: '',
-      answer: '',
       option1: '',
       option2: '',
       option3: '',
-      option4: ''
+      option4: '',
+      pageN: 0,
+      indexN: 0
     };
     this.handleChange = this.handleChange.bind(this);
     this.checkAnswer = this.checkAnswer.bind(this);
@@ -35,7 +35,13 @@ class App extends React.Component {
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevState.timer !== this.state.timer && this.state.timer === 0) {
       clearInterval(this.countDown)
+      this.outOfTime();
     }
+  }
+
+
+  outOfTime = () => {
+    alert('time is up!');
   }
 
 
@@ -89,7 +95,8 @@ class App extends React.Component {
 
       this.setState({
         gameImage: games.data.results[resultNum].short_screenshots[randomImageIndex].image,
-        answer: games.data.results[resultNum].name
+        pageN: pageNum,
+        indexN: resultNum
         }, () => { this.setOptions(games.data.results) }
       );
     })
@@ -102,13 +109,13 @@ class App extends React.Component {
   setOptions = (gamesList) => {
     let otherGameTitles = [];
     gamesList.forEach((game) => {
-      if (game.name !== this.state.answer) {
+      if (game.name !== gamesList[this.state.indexN].name) {
         otherGameTitles.push(game.name);
       }
     })
 
     let options = [];
-    options.push(this.state.answer);
+    options.push(gamesList[this.state.indexN].name);
     while (options.length < 4) {
       let randomIndex = Math.floor(Math.random() * otherGameTitles.length);
       options.push(otherGameTitles[randomIndex]);
@@ -132,17 +139,23 @@ class App extends React.Component {
 
 
   checkAnswer = () => {
-    if (event.target.innerText === this.state.answer) {
-      this.setState({
+    let selectedGameName = event.target.innerText;
+    axios.get(`https://api.rawg.io/api/games?key=${API_KEY}&page=${this.state.pageN}&ordering=-metacritic`)
+    .then((games) => {
+      if (selectedGameName === games.data.results[this.state.indexN].name) {
+        this.setState({
         currentScore: (this.state.currentScore + 100)
       })
-    } else {
-      this.setState({
-        currentScore: (this.state.currentScore - 100)
-      })
-    }
-
-    this.generateQuestion();
+      } else {
+        this.setState({
+          currentScore: (this.state.currentScore - 100)
+        })
+      }
+      this.generateQuestion();
+    })
+    .catch((err) => {
+      console.log(err);
+    })
   }
 
 
