@@ -13,7 +13,8 @@ class App extends React.Component {
     this.state = {
       username: '',
       currentScore: 0,
-      timer: 15,
+      highScores: [],
+      timer: 60,
       gameImage: '',
       option1: '',
       option2: '',
@@ -29,19 +30,56 @@ class App extends React.Component {
 
   componentDidMount() {
     this.checkUsername();
+    this.getLeaderboard();
   }
 
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (prevState.timer !== this.state.timer && this.state.timer === 0) {
-      clearInterval(this.countDown)
+      clearInterval(this.countDown);
       this.outOfTime();
+      this.uploadScore();
+      this.resetGame();
+      this.openLeaderboard();
     }
   }
 
 
   outOfTime = () => {
     alert('time is up!');
+    document.getElementsByClassName("game")[0].style.display = 'none';
+    document.getElementsByClassName("start")[0].style.display = 'block';
+  }
+
+
+  uploadScore = () => {
+    var newScore = {
+      "username": this.state.username,
+      "score": this.state.currentScore
+    };
+
+    axios.post('/leaderboard', newScore)
+    .then(() => {
+      this.getLeaderboard();
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+  }
+
+
+  resetGame = () => {
+    this.setState({
+      currentScore: 0,
+      timer: 60,
+      gameImage: '',
+      option1: '',
+      option2: '',
+      option3: '',
+      option4: '',
+      pageN: 0,
+      indexN: 0
+    })
   }
 
 
@@ -67,7 +105,6 @@ class App extends React.Component {
     document.getElementsByClassName("start")[0].style.display = 'none';
     document.getElementsByClassName("game")[0].style.display = 'block';
     this.generateQuestion();
-    this.startTimer();
   }
 
 
@@ -77,6 +114,11 @@ class App extends React.Component {
         timer: (this.state.timer - 1)
       })
     }, 1000)
+  }
+
+
+  stopTimer = () => {
+    clearInterval(this.countDown);
   }
 
 
@@ -139,6 +181,7 @@ class App extends React.Component {
 
 
   checkAnswer = () => {
+    this.stopTimer();
     let selectedGameName = event.target.innerText;
     axios.get(`https://api.rawg.io/api/games?key=${API_KEY}&page=${this.state.pageN}&ordering=-metacritic`)
     .then((games) => {
@@ -159,11 +202,37 @@ class App extends React.Component {
   }
 
 
+  getLeaderboard = () => {
+    axios.get('/leaderboard')
+    .then((stats) => {
+      this.setState({
+        highScores: stats.data
+      })
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+  }
+
+
+  openLeaderboard = () => {
+    var popup = document.getElementById("popup");
+    popup.classList.add("open-popup");
+  }
+
+
+  hideLeaderboard = () => {
+    var popup = document.getElementById("popup");
+    popup.classList.remove("open-popup");
+  }
+
+
   render() {
     return (
       <>
-        <StartScreen handleChange={this.handleChange} beginGame={this.beginGame} />
-        <GameScreen checkAnswer={this.checkAnswer} gameImage={this.state.gameImage} option1={this.state.option1} option2={this.state.option2} option3={this.state.option3} option4={this.state.option4} currentScore={this.state.currentScore} timer={this.fmtMSS(this.state.timer)} />
+        <StartScreen handleChange={this.handleChange} beginGame={this.beginGame} openLeaderboard={this.openLeaderboard} hideLeaderboard={this.hideLeaderboard} highScores={this.state.highScores} />
+
+        <GameScreen checkAnswer={this.checkAnswer} gameImage={this.state.gameImage} option1={this.state.option1} option2={this.state.option2} option3={this.state.option3} option4={this.state.option4} currentScore={this.state.currentScore} timer={this.fmtMSS(this.state.timer)} getLeaderboard={this.getLeaderboard} startTimer={this.startTimer} />
       </>
     )
   }

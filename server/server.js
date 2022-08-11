@@ -1,30 +1,34 @@
 const path = require("path");
 const express = require("express");
-const axios = require('axios');
+const app = express();
+const cors = require('cors')
+const pool = require('./databasepg.js');
 
-const app = express;
+app.use(cors());
 
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
 
-app.get('https://api.rawg.io/api/games/', (req, res) => {
-  getProductInfo(req.url, req.params)
-    .then(response => {
-      res.send(response.data);
-    })
-    .catch(err => {
-      console.log('fetching error***********', err);
-    })
+app.post('/leaderboard', async (req, res) => {
+  try{
+    const newStat = await pool.query('INSERT INTO leaderboard (username, score) VALUES ($1, $2)', [req.body.username, req.body.score]);
+    res.json(newStat);
+  } catch (err) {
+    console.error(err.message);
+  }
 })
 
-// app.get('/', (req, res) => {
-//   console.log('asdf');
-//   res.send('hello')
-// })
 
-
+app.get('/leaderboard', async (req, res) => {
+  try {
+    const allStats = await pool.query('SELECT username, score FROM leaderboard ORDER BY score DESC LIMIT ($1)', [10]);
+    res.json(allStats.rows);
+  } catch (err) {
+    console.error(err.message);
+  }
+})
 
 
 app.listen(3000, () => {
