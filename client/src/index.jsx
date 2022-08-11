@@ -13,6 +13,7 @@ class App extends React.Component {
     this.state = {
       username: '',
       currentScore: 0,
+      timer: 5,
       data: [],
       gameImage: '',
       answer: '',
@@ -25,12 +26,17 @@ class App extends React.Component {
     this.checkAnswer = this.checkAnswer.bind(this);
   }
 
+
   componentDidMount() {
     this.checkUsername();
-
   }
 
-  // axios.get(`https://api.rawg.io/api/games/4200/screenshots?key=${API_KEY}`)
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    if (prevState.timer !== this.state.timer && this.state.timer === 0) {
+      clearInterval(this.countDown)
+    }
+  }
 
 
   handleChange = (event) => {
@@ -55,6 +61,21 @@ class App extends React.Component {
     document.getElementsByClassName("start")[0].style.display = 'none';
     document.getElementsByClassName("game")[0].style.display = 'block';
     this.generateQuestion();
+    this.startTimer();
+  }
+
+
+  startTimer = () => {
+    this.countDown = setInterval(() => {
+      this.setState({
+        timer: (this.state.timer - 1)
+      })
+    }, 1000)
+  }
+
+
+  fmtMSS(s) {
+    return (s - (s %= 60)) / 60 + (9 < s ? ':' : ':0') + s
   }
 
 
@@ -111,7 +132,6 @@ class App extends React.Component {
 
 
   checkAnswer = () => {
-    console.log()
     if (event.target.innerText === this.state.answer) {
       this.setState({
         currentScore: (this.state.currentScore + 100)
@@ -130,7 +150,7 @@ class App extends React.Component {
     return (
       <>
         <StartScreen handleChange={this.handleChange} beginGame={this.beginGame} />
-        <GameScreen checkAnswer={this.checkAnswer} gameImage={this.state.gameImage} option1={this.state.option1} option2={this.state.option2} option3={this.state.option3} option4={this.state.option4} />
+        <GameScreen checkAnswer={this.checkAnswer} gameImage={this.state.gameImage} option1={this.state.option1} option2={this.state.option2} option3={this.state.option3} option4={this.state.option4} currentScore={this.state.currentScore} timer={this.fmtMSS(this.state.timer)} />
       </>
     )
   }

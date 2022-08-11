@@ -7,8 +7,8 @@ const GameScreen = (props) => {
       <h1>Game is about to begin</h1>
 
       <div className='triviaSection'>
-        <div id='timer'>Timer</div>
-        <div id='score'>Score</div>
+        <div id='timer'>{ 'Timer: ' + props.timer }</div>
+        <div id='score'>{ 'Score: ' + props.currentScore }</div>
 
         <div className='imageDiv'>
           <img id='gameImage' src={ props.gameImage } alt="..." />
