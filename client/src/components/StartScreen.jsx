@@ -25,7 +25,7 @@ const StartScreen = (props) => {
 
       <div className="popup" id="popup" >
         <BsXSquare className="bi bi-x-square" style={{ fontSize: "25px", position: "absolute", top: 0, right: 0, paddingRight: "10px", cursor : "pointer" }} onClick={ () => { props.hideLeaderboard() }} />
-        <h3 style={{ display: "flex", justifyContent: "center", alignItems: "center" }} >{'Leaderboard (Top 10)'}</h3>
+        <h3 style={{ display: "flex", justifyContent: "center", alignItems: "center" }} >{'Leaderboard (Top 20)'}</h3>
 
         <LeaderboardTable highScores={props.highScores} />
 

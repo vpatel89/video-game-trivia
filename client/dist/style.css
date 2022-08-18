@@ -91,7 +91,7 @@
   position: absolute;
   background-color: white;
   border-style: solid;
-  height: 500px;
+  height: 910px;
   width: 600px;
   top: 0;
   left: 50%;
@@ -102,7 +102,7 @@
 
 .open-popup {
   visibility: visible;
-  top: 50%;
+  top: 510px;
   transform: translate(-50%, -50%) scale(1);
 }
 

@@ -23,7 +23,7 @@ app.post('/leaderboard', async (req, res) => {
 
 app.get('/leaderboard', async (req, res) => {
   try {
-    const allStats = await pool.query('SELECT username, score FROM leaderboard ORDER BY score DESC LIMIT ($1)', [10]);
+    const allStats = await pool.query('SELECT username, score FROM leaderboard ORDER BY score DESC LIMIT ($1)', [20]);
     res.json(allStats.rows);
   } catch (err) {
     console.error(err.message);
@@ -32,5 +32,5 @@ app.get('/leaderboard', async (req, res) => {
 
 
 app.listen(3000, () => {
-  console.log('Listening on PORT 3000.');
+  console.log('Connected');
 });
