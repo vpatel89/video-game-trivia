@@ -23,7 +23,7 @@ const LeaderboardTable = (props) => {
         </tr>
       </thead>
       <tbody>
-        {tableRows}
+        { tableRows }
       </tbody>
     </table>
   )

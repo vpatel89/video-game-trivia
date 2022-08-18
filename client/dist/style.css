@@ -129,3 +129,11 @@ table th {
   background-color: gray;
   color: white;
 }
+
+#timer {
+  font-size: 40px;
+}
+
+#score {
+  font-size: 25px;
+}
